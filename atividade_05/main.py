@@ -85,11 +85,15 @@ class Lexer:
 
 # Representação da árvore sintática
 class Expressao:
-    pass
+    def avaliar(self):
+        raise NotImplementedError()
 
 class Numero(Expressao):
     def __init__(self, valor: int):
         self.valor = valor
+
+    def avaliar(self):
+        return self.valor
 
     def __repr__(self):
         return str(self.valor)
@@ -100,6 +104,20 @@ class OperacaoBinaria(Expressao):
         self.esquerda = esquerda
         self.direita = direita
     
+    def avaliar(self):
+        esq = self.esquerda.avaliar()
+        dir = self.direita.avaliar()
+        if self.operador == '+':
+            return esq + dir
+        elif self.operador == '-':
+            return esq - dir
+        elif self.operador == '*':
+            return esq * dir
+        elif self.operador == '/':
+            if dir == 0:
+                raise ZeroDivisionError("Divisão por zero")
+            return esq / dir
+
     def __repr__(self):
         return f"({self.operador} {self.esquerda} {self.direita})"
 
@@ -142,9 +160,6 @@ class Parser:
 def processar_expressao(expressao: str):
     lexer = Lexer(expressao)
     tokens = lexer.todos_tokens()
-    # Imprimir tokens
-    for token in tokens:
-        print(token)
     parser = Parser(tokens)
     arvore = parser.analisar_expressao()
     return arvore
@@ -164,4 +179,4 @@ if __name__ == "__main__":
     print(resultado)
     print("\n")
     imprimir_arvore(resultado)
-
+    print("\nResultado da avaliação:", resultado.avaliar())
