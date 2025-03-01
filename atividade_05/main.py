@@ -116,7 +116,7 @@ class OperacaoBinaria(Expressao):
             return esq * dir
         elif self.operador == '/':
             if dir == 0:
-                raise ZeroDivisionError("Divisão por zero")
+                raise ZeroDivisionError("Erro: Segundo operando da divisão é zero.")
             return esq / dir
 
     def __repr__(self):
@@ -139,7 +139,7 @@ class Parser:
     def analisar_expressao(self) -> Expressao:
         expressao = self._analisar_expressao()
         if self._token_atual().tipo != TokenType.EOF:
-            raise SyntaxError("Tokens extras ao final da expressão")
+            raise SyntaxError("Erro: Tokens extras ao final da expressão.")
         return expressao
     
     def _analisar_expressao(self) -> Expressao:
@@ -152,15 +152,17 @@ class Parser:
             esquerda = self._analisar_expressao()
             operador = self._token_atual()
             if operador.tipo not in {TokenType.SOMA, TokenType.SUBTRACAO, TokenType.MULTIPLICACAO, TokenType.DIVISAO}:
-                raise SyntaxError(f"Operador esperado, mas encontrado {operador.tipo}")
+                raise SyntaxError(f"Erro: Operador esperado, mas encontrado {operador.tipo}.")
             self._consumir()
+            if self._token_atual().tipo == TokenType.PAREN_DIR:
+                raise SyntaxError(f"Erro: Segundo operando da {operador.lexema} está faltando.")
             direita = self._analisar_expressao()
             if self._token_atual().tipo != TokenType.PAREN_DIR:
-                raise SyntaxError("Parêntese direito esperado")
+                raise SyntaxError("Erro: Parêntese direito esperado.")
             self._consumir()
             return OperacaoBinaria(operador.lexema, esquerda, direita)
         else:
-            raise SyntaxError(f"Erro sintático: token inesperado {token}")
+            raise SyntaxError(f"Erro: Token inesperado {token}.")
 
 def processar_expressao(expressao: str):
     lexer = Lexer(expressao)
@@ -177,6 +179,7 @@ def imprimir_arvore(no, prefixo="", is_left=True):
         imprimir_arvore(no.esquerda, prefixo + ("│   " if is_left else "    "), True)
     elif isinstance(no, Numero):
         print(prefixo + ("├── " if is_left else "└── ") + str(no.valor))
+        
 def executar_testes(diretorio):
     for arquivo in sorted(os.listdir(diretorio)):
         caminho = os.path.join(diretorio, arquivo)
