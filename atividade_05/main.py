@@ -152,7 +152,7 @@ class Parser:
             esquerda = self._analisar_expressao()
             operador = self._token_atual()
             if operador.tipo not in {TokenType.SOMA, TokenType.SUBTRACAO, TokenType.MULTIPLICACAO, TokenType.DIVISAO}:
-                raise SyntaxError(f"Erro: Operador esperado, mas encontrado {operador.tipo}.")
+                raise SyntaxError(f"Erro: Operador ou parêntese direito esperado, mas encontrado {operador.tipo}.")
             self._consumir()
             if self._token_atual().tipo == TokenType.PAREN_DIR:
                 raise SyntaxError(f"Erro: Segundo operando da {operador.lexema} está faltando.")
@@ -162,7 +162,7 @@ class Parser:
             self._consumir()
             return OperacaoBinaria(operador.lexema, esquerda, direita)
         else:
-            raise SyntaxError(f"Erro: Token inesperado {token}.")
+            raise SyntaxError(f"Erro: Token inesperado: {token.lexema}")
 
 def processar_expressao(expressao: str):
     lexer = Lexer(expressao)
