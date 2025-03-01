@@ -4,6 +4,7 @@
 # // - MICHAEL DA CUNHA PINHO
 # // - RENAN GONDIM DIAS DE ALBUQUERQUE
 
+import os
 from typing import List
 
 # Definição das classes de token
@@ -156,6 +157,7 @@ class Parser:
         else:
             raise SyntaxError(f"Erro sintático: token inesperado {token}")
 
+
 # Função principal
 def processar_expressao(expressao: str):
     lexer = Lexer(expressao)
@@ -163,6 +165,7 @@ def processar_expressao(expressao: str):
     parser = Parser(tokens)
     arvore = parser.analisar_expressao()
     return arvore
+
 
 def imprimir_arvore(no, prefixo="", is_left=True):
     if isinstance(no, OperacaoBinaria):
@@ -172,11 +175,23 @@ def imprimir_arvore(no, prefixo="", is_left=True):
     elif isinstance(no, Numero):
         print(prefixo + ("├── " if is_left else "└── ") + str(no.valor))
 
-# Testes
+def executar_testes(diretorio):
+    for arquivo in os.listdir(diretorio):
+        caminho = os.path.join(diretorio, arquivo)
+        with open(caminho, 'r') as f:
+            expressao = f.read().strip()
+        print(f"Expressão de entrada ({arquivo}): {expressao}")
+        try:
+            resultado = processar_expressao(expressao)
+            print("\nÁrvore Sintática:")
+            imprimir_arvore(resultado)
+            print("\nResultado da avaliação:", resultado.avaliar())
+        except Exception as e:
+            print("Erro:", e)
+        print("=" * 40)
+
 if __name__ == "__main__":
-    exemplo = "(3 + (4 * 2))"
-    resultado = processar_expressao(exemplo)
-    print("Expressão de entrada:", exemplo)
-    print("\nÁrvore Sintática:\n")
-    imprimir_arvore(resultado)
-    print("\nResultado da avaliação:", resultado.avaliar())
+    print("=== TESTES VÁLIDOS ===")
+    executar_testes("valid_tests")
+    print("=== TESTES INVÁLIDOS ===")
+    executar_testes("invalid_tests")
