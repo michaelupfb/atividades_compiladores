@@ -137,19 +137,24 @@ class Parser:
         return token
     
     def analisar_expressao(self) -> Expressao:
+        expressao = self._analisar_expressao()
+        if self._token_atual().tipo != TokenType.EOF:
+            raise SyntaxError("Tokens extras ao final da expressão")
+        return expressao
+    
+    def _analisar_expressao(self) -> Expressao:
         token = self._token_atual()
-        
         if token.tipo == TokenType.NUMERO:
             self._consumir()
             return Numero(int(token.lexema))
         elif token.tipo == TokenType.PAREN_ESQ:
             self._consumir()
-            esquerda = self.analisar_expressao()
+            esquerda = self._analisar_expressao()
             operador = self._token_atual()
             if operador.tipo not in {TokenType.SOMA, TokenType.SUBTRACAO, TokenType.MULTIPLICACAO, TokenType.DIVISAO}:
                 raise SyntaxError(f"Operador esperado, mas encontrado {operador.tipo}")
             self._consumir()
-            direita = self.analisar_expressao()
+            direita = self._analisar_expressao()
             if self._token_atual().tipo != TokenType.PAREN_DIR:
                 raise SyntaxError("Parêntese direito esperado")
             self._consumir()
@@ -157,8 +162,6 @@ class Parser:
         else:
             raise SyntaxError(f"Erro sintático: token inesperado {token}")
 
-
-# Função principal
 def processar_expressao(expressao: str):
     lexer = Lexer(expressao)
     tokens = lexer.todos_tokens()
@@ -174,18 +177,18 @@ def imprimir_arvore(no, prefixo="", is_left=True):
         imprimir_arvore(no.esquerda, prefixo + ("│   " if is_left else "    "), True)
     elif isinstance(no, Numero):
         print(prefixo + ("├── " if is_left else "└── ") + str(no.valor))
-
 def executar_testes(diretorio):
-    for arquivo in os.listdir(diretorio):
+    for arquivo in sorted(os.listdir(diretorio)):
         caminho = os.path.join(diretorio, arquivo)
         with open(caminho, 'r') as f:
             expressao = f.read().strip()
         print(f"Expressão de entrada ({arquivo}): {expressao}")
         try:
             resultado = processar_expressao(expressao)
+            avaliacao = resultado.avaliar()
             print("\nÁrvore Sintática:")
             imprimir_arvore(resultado)
-            print("\nResultado da avaliação:", resultado.avaliar())
+            print("\nResultado da avaliação:", avaliacao)
         except Exception as e:
             print("Erro:", e)
         print("=" * 40)
