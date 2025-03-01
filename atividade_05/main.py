@@ -176,7 +176,7 @@ def imprimir_arvore(no, prefixo="", is_left=True):
 if __name__ == "__main__":
     exemplo = "(3 + (4 * 2))"
     resultado = processar_expressao(exemplo)
-    print(resultado)
-    print("\n")
+    print("Expressão de entrada:", exemplo)
+    print("\nÁrvore Sintática:\n")
     imprimir_arvore(resultado)
     print("\nResultado da avaliação:", resultado.avaliar())
