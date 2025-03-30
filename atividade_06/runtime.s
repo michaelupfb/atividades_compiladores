@@ -1,46 +1,62 @@
-.section .text
-.global imprime_num
-.global sair
+  #
+  # funcoes de apoio para o codigo compilado
+  #
 
-# Função imprime_num
-# Entrada: número em %rax
 imprime_num:
-    mov %rax, %rdi
-    mov $buf + 20, %rsi
-    mov $10, %rbx
+  xor %r9, %r9            # rcx indice, r9 contagem
+  mov $20, %rcx
+  movb $10, buffer(%rcx)  # \n no final da string
+  dec %rcx
+  inc %r9
 
-.convert_loop:
-    xor %rdx, %rdx
-    div %rbx
-    add $'0', %rdx
-    dec %rsi
-    mov %dl, (%rsi)
-    test %rax, %rax
-    jnz .convert_loop
+  mov $10, %r8
+  or %rax, %rax
+  jz printzero_L0
+  jl mark_neg
+  mov $0, %r10            # r10 flag p/ negativo
+  jmp loop_L0
 
-    mov $1, %rax        # syscall write
-    mov $1, %rdi        # stdout
-    mov %rsi, %rsi
-    mov $buf + 20, %rdx
-    sub %rsi, %rdx
-    syscall
+mark_neg:
+  mov $1, %r10
+  neg %rax
 
-    mov $1, %rax        # syscall write
-    mov $1, %rdi
-    mov $newline, %rsi
-    mov $1, %rdx
-    syscall
-    ret
+loop_L0:
+  cqo
+  idiv %r8	
+  addb $0x30, %dl
+  movb %dl, buffer(%rcx)
+  dec %rcx
+  inc %r9
+  or %rax, %rax
+  jnz loop_L0
+  test %r10, %r10
+  jz print_L0
+  movb $45, buffer(%rcx)
+  dec %rcx
+  jmp print_L0
 
-# Função sair
+printzero_L0:
+  movb $0x30, buffer(%rcx)
+  dec %rcx
+  inc %r9
+
+print_L0:
+  mov $1, %rax            # sys_write
+  mov $1, %rdi            # stdout
+  mov $buffer, %rsi       # dados
+  inc %rcx
+  add %rcx, %rsi
+  mov %r9, %rdx           # tamanho
+  syscall
+  ret
+
 sair:
-    mov $60, %rax       # syscall: exit
-    xor %rdi, %rdi
-    syscall
+  mov $60, %rax 		# sys_exit
+  xor %rdi, %rdi 		# codigo de saida (0)
+  syscall
+
 
 .section .bss
-    .lcomm buf, 20
+  .lcomm buffer, 21
 
-.section .data
-newline:
-    .ascii "\n"
+
