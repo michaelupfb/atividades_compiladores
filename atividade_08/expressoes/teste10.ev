@@ -1,0 +1,5 @@
+inicial = 50;
+fator = 2;
+dobrado = inicial * fator;
+dividido = inicial / fator;
+= dobrado - dividido

@@ -1,0 +1,5 @@
+num1 = 7;
+num2 = 3;
+resultMult = num1 * num2;
+resultAdd = num1 + num2;
+= resultMult + resultAdd

@@ -1,0 +1,4 @@
+primeiro = 30;
+segundo = 5;
+terceiro = primeiro / segundo;
+= primeiro - terceiro

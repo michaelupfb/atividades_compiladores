@@ -1,0 +1,5 @@
+a = 12;
+b = 6;
+temp = a - b;
+final = temp * 5;
+= final

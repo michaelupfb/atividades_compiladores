@@ -1,0 +1,4 @@
+val1 = 15;
+val2 = 4;
+remainder = val1 - (val2 * (val1 / val2));
+= remainder
