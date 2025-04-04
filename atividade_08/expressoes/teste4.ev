@@ -1,0 +1,5 @@
+counter = 0;
+increment = 5;
+counter = counter + increment;
+counter = counter + increment;
+= counter
