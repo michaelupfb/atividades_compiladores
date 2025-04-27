@@ -51,13 +51,13 @@ for filename in sorted(os.listdir(PASTA_CMD)):
 
         # Se o arquivo .asm não existir, compila
         if not os.path.exists(caminho_asm):
-            print(f"🛠️ Compilando...")
+            print("🛠️ Compilando todos os arquivos de uma vez...")
             try:
-                subprocess.run(["python3", "compilador.py", caminho_cmd, "-o", caminho_asm], check=True, capture_output=True)
+                subprocess.run(["python3", "compilador.py"], check=True, capture_output=True)
                 print("✅ Compilação OK.")
             except subprocess.CalledProcessError as e:
                 print(f"❌ Erro de compilação:\n{e.stderr.decode()}")
-                continue
+                exit(1)
         else:
             print(f"📄 Usando arquivo .asm já existente: {caminho_asm}")
 
