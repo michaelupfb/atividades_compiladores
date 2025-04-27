@@ -1,7 +1,7 @@
 import os
 import re
 
-# Definir tokens
+# Lista de tokens
 TOKENS = [
     ("IF", r"if"),
     ("ELSE", r"else"),
@@ -175,7 +175,7 @@ class Parser:
 
     def prim(self):
         token = self.current_token()
-        if token:  # Adicione esta verificação para garantir que token não é None
+        if token:
             if token[0] == "NUM":
                 self.consume("NUM")
                 return ("NUM", int(token[1]))
@@ -267,7 +267,7 @@ def generate_code(ast):
             label_counter[0] += 1
             gen_expr(condicao)
             code_lines.append("cmp $0, %rax")
-            code_lines.append(f"je {label_if_false}")  # ✅ je no lugar certo
+            code_lines.append(f"je {label_if_false}")
             for cmd in bloco_if:
                 gen_comando(cmd)
             code_lines.append(f"jmp {label_if_end}")
@@ -311,7 +311,7 @@ def compile_program(program):
     ast = parser.parse()
     return generate_code(ast)
 
-# Caminhos (ajuste conforme a sua estrutura de pastas)
+# Caminhos
 input_dir = "programas_cmd"
 output_dir = "saidas_asm_cmd"
 expected_output_dir = "saida_esperada_cmd"
@@ -320,7 +320,7 @@ os.makedirs(input_dir, exist_ok=True)
 os.makedirs(output_dir, exist_ok=True)
 os.makedirs(expected_output_dir, exist_ok=True)
 
-# Processar todos os arquivos .cmd
+# Processar todos os arquivos
 for filename in sorted(os.listdir(input_dir)):
     if filename.endswith(".cmd"):
         input_path = os.path.join(input_dir, filename)
@@ -331,9 +331,11 @@ for filename in sorted(os.listdir(input_dir)):
             with open(input_path, "r") as f:
                 program = f.read().strip()
                 tokens = tokenize(program)
+                # Debbug:
                 # print(f"Tokens de {filename}: {tokens}")
                 parser = Parser(tokens)
                 ast = parser.parse()
+                # Debbug:
                 # print(f"AST de {filename}: {ast}")
                 asm_code = generate_code(ast)
                 with open(output_path, "w") as out_f:
@@ -341,5 +343,3 @@ for filename in sorted(os.listdir(input_dir)):
                 print(f"✅ Gerado: {filename.replace('.cmd', '.asm')}")
         except ValueError as e:
             print(f"❌ Erro em {filename}: {e}")
-
-# Atualize o testador.py para lidar com os novos arquivos .cmd e pastas de saída/esperada
